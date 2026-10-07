@@ -33,7 +33,8 @@ try {
     assert.equal(notice.status(), 200, `${file} ships with the static site`);
     assert.ok((await notice.text()).includes('Permission is hereby granted'));
   }
-  await page.getByRole('button', { name: 'PLAY LOCAL' }).click();
+  await page.getByRole('button', { name: 'PLAY GAME' }).click();
+  await page.getByRole('button', { name: 'CONTINUE', exact: true }).click();
   await page.getByRole('button', { name: 'LET’S GRAB' }).click();
   await page.waitForFunction(() => document.querySelector('#round-message strong')?.textContent === 'GRAB!');
   assert.equal(await page.evaluate(() => '__GRABSHIFT__' in window), false, 'development hook is absent from release');
@@ -50,6 +51,32 @@ try {
   assert.ok(Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01);
   await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
   assert.equal(await page.locator('.menu-art img').evaluate(img => img.complete && img.naturalWidth > 0), true);
+  // Exercise solo mode in the actual release bundle, without the development hook.
+  await page.getByRole('button', { name: 'PLAY GAME' }).click();
+  await page.getByLabel('GAME MODE').selectOption('bot');
+  await page.getByLabel('BOT DIFFICULTY').selectOption('hard');
+  await page.getByRole('button', { name: 'CONTINUE', exact: true }).click();
+  await page.getByRole('button', { name: 'LET’S GRAB' }).click();
+  await page.waitForFunction(() => document.querySelector('#round-message strong')?.textContent === 'GRAB!');
+  assert.equal(await page.locator('.p2 .player-label').textContent(), 'BOT · HARD');
+  const botX = () => page.locator('canvas').evaluate(canvas => {
+    const context = canvas.getContext('2d');
+    const pixels = context.getImageData(0, 0, canvas.width, canvas.height).data;
+    let sum = 0, count = 0;
+    for (let index = 0; index < pixels.length; index += 4) {
+      // The orange ragdoll is the only orange geometry in the arena.
+      if (pixels[index] > 245 && pixels[index + 1] > 160 && pixels[index + 1] < 185 && pixels[index + 2] > 108 && pixels[index + 2] < 132) {
+        sum += index / 4 % canvas.width; count++;
+      }
+    }
+    if (count < 100) throw new Error('Bot silhouette was not rendered');
+    return sum / count;
+  });
+  const startX = await botX();
+  await page.waitForTimeout(1000);
+  assert.ok(await botX() < startX - 40, 'bot visibly moves without keyboard input');
+  await page.keyboard.press('Escape');
+  await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
   assert.deepEqual(errors, [], 'no browser errors'); assert.deepEqual(failed, [], 'all subpath assets load');
-  console.log('Production smoke passed: /grabshift/ assets, countdown, keyboard gameplay, pause, resize, menu, no debug hook, no console errors.');
+  console.log('Production smoke passed: /grabshift/ assets, local keyboard play, solo bot movement, mode/difficulty selection, pause, resize, no debug hook, no console errors.');
 } finally { if (browser) await browser.close(); await new Promise(resolve => server.close(resolve)); }

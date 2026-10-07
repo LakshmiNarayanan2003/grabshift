@@ -3,7 +3,8 @@ import type { GameScene } from '../src/game/scenes/GameScene';
 
 async function start(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'PLAY LOCAL' }).click();
+  await page.getByRole('button', { name: 'PLAY GAME' }).click();
+  await page.getByRole('button', { name: 'CONTINUE', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'GET A GRIP.' })).toBeVisible();
   await page.getByRole('button', { name: 'LET’S GRAB' }).click();
   await expect.poll(() => page.evaluate(() => (window.__GRABSHIFT__!.scene.getScene('Game') as GameScene).rounds.phase)).toBe('active');
@@ -105,7 +106,7 @@ test('a complete match scores, resets, wins, rematches, and returns to menu with
   expect(await counts()).toEqual(initial);
   await page.keyboard.press('Escape');
   await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
-  await expect(page.getByRole('button', { name: 'PLAY LOCAL' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'PLAY GAME' })).toBeVisible();
 });
 
 test('settings persist, menu supports keyboard navigation, F3 is development only', async ({ page }) => {
@@ -115,8 +116,10 @@ test('settings persist, menu supports keyboard navigation, F3 is development onl
   await page.reload(); await page.getByRole('button', { name: 'Settings' }).click();
   await expect(page.locator('#sound')).not.toBeChecked(); await expect(page.locator('#motion')).toBeChecked();
   await page.keyboard.press('Escape');
-  await expect(page.getByRole('button', { name: 'PLAY LOCAL' })).toBeFocused();
+  await expect(page.getByRole('button', { name: 'PLAY GAME' })).toBeFocused();
   await page.keyboard.press('Enter');
+  await expect(page.getByRole('combobox', { name: 'GAME MODE' })).toBeFocused();
+  await page.getByRole('button', { name: 'CONTINUE', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'GET A GRIP.' })).toBeVisible();
   await page.keyboard.press('F3');
   await expect.poll(() => page.evaluate(() => (window.__GRABSHIFT__!.scene.getScene('Game') as GameScene).debug)).toBe(true);

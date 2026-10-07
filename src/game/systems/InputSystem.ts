@@ -5,7 +5,7 @@ export class InputSystem {
   private pressed = new Set<string>();
   private readonly codes = new Set(['KeyA', 'KeyD', 'KeyW', 'KeyF', 'KeyG', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'KeyK', 'KeyL', 'Escape', 'F3']);
   private keydown = (e: KeyboardEvent) => {
-    if (e.target instanceof HTMLInputElement && e.code !== 'Escape') return;
+    if ((e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) && e.code !== 'Escape') return;
     if (!this.codes.has(e.code)) return;
     e.preventDefault();
     if (!e.repeat && !this.down.has(e.code)) this.pressed.add(e.code);

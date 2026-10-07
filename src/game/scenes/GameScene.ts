@@ -9,6 +9,8 @@ import { SoundSystem } from '../systems/SoundSystem';
 import { loadSettings } from '../systems/Settings';
 import { ArenaRenderer } from '../rendering/ArenaRenderer';
 import { UI } from '../../ui/UI';
+import { BotSystem } from '../systems/BotSystem';
+import { defaultMatch, type MatchOptions } from '../match';
 
 export class GameScene extends Phaser.Scene {
   simulation!: Simulation;
@@ -18,6 +20,8 @@ export class GameScene extends Phaser.Scene {
   paused = true;
   mode: 'menu' | 'match' = 'menu';
   debug = false;
+  matchOptions: MatchOptions = defaultMatch();
+  bot: BotSystem | null = null;
   private arenaView!: ArenaRenderer;
   private effects!: EffectsSystem;
   private audioCues!: SoundSystem;
@@ -33,7 +37,7 @@ export class GameScene extends Phaser.Scene {
     this.simulation = new Simulation(2, 'pit', event => { if (this.mode === 'match' && this.rounds.phase === 'active') this.effects.grab(event); });
     this.controls = new InputSystem();
     this.arenaView = new ArenaRenderer(this);
-    this.ui = new UI({ start: () => this.startMatch(), restart: () => this.startMatch(), resume: () => this.resumeMatch(), menu: () => this.mainMenu(), unlock: () => this.audioCues.unlock() }, settings);
+    this.ui = new UI({ start: options => this.startMatch(options), restart: () => this.startMatch(), resume: () => this.resumeMatch(), menu: () => this.mainMenu(), unlock: () => this.audioCues.unlock() }, settings);
     Events.on(this.simulation.engine, 'collisionStart', event => {
       if (this.mode !== 'match' || this.rounds.phase !== 'active') return;
       for (const pair of event.pairs) {
@@ -51,12 +55,14 @@ export class GameScene extends Phaser.Scene {
       Events.off(this.simulation.engine, 'collisionStart'); this.controls.dispose(); this.simulation.dispose(); this.audioCues.dispose(); this.ui.dispose();
     });
   }
-  startMatch(): void {
+  startMatch(options: MatchOptions = this.matchOptions): void {
+    this.matchOptions = { ...options };
+    this.bot = options.mode === 'bot' ? new BotSystem(options.difficulty, Math.floor(Math.random() * 0x100000000)) : null;
     this.mode = 'match'; this.paused = false; this.rounds.restart(); this.simulation.reset(); this.controls.clear(); this.effects.clear(); this.accumulator = 0; this.lastCountdown = '';
   }
   pauseMatch(): void { this.paused = true; this.controls.clear(); this.accumulator = 0; this.ui.showPause(); }
   resumeMatch(): void { this.paused = false; this.controls.clear(); this.accumulator = 0; }
-  mainMenu(): void { this.mode = 'menu'; this.paused = true; this.controls.clear(); this.effects.clear(); }
+  mainMenu(): void { this.mode = 'menu'; this.paused = true; this.bot = null; this.controls.clear(); this.effects.clear(); }
   update(_time: number, rawDelta: number): void {
     const delta = Math.min(rawDelta, 80);
     if (this.controls.take('Escape')) {
@@ -67,7 +73,7 @@ export class GameScene extends Phaser.Scene {
     if (import.meta.env.DEV && this.controls.take('F3')) this.debug = !this.debug;
     if (this.mode === 'match' && !this.paused && this.rounds.phase !== 'matchOver') {
       const event = this.rounds.update(delta, this.simulation.players);
-      if (event === 'reset') { this.simulation.reset(); this.controls.clear(); this.effects.clear(); this.accumulator = 0; }
+      if (event === 'reset') { this.simulation.reset(); this.bot?.reset(); this.controls.clear(); this.effects.clear(); this.accumulator = 0; }
       if (event === 'point') { this.controls.clear(); this.audioCues.play('point'); }
       if (event === 'go') { this.controls.clear(); this.audioCues.play('go'); }
       if (this.rounds.countdown !== this.lastCountdown) {
@@ -77,7 +83,9 @@ export class GameScene extends Phaser.Scene {
       const speed = this.rounds.phase === 'resolving' ? 0.24 : this.effects.slowFor > 0 ? 0.4 : 1;
       this.accumulator += delta * speed;
       while (this.accumulator >= WORLD.step) {
-        this.simulation.step(this.rounds.phase === 'active' ? this.controls.read() : this.controls.idle());
+        const inputs = this.rounds.phase === 'active' ? this.controls.read() : this.controls.idle();
+        if (this.bot && this.rounds.phase === 'active') inputs[1] = this.bot.read(this.simulation);
+        this.simulation.step(inputs);
         this.accumulator -= WORLD.step;
       }
       if (this.rounds.phase !== 'active') this.controls.read();

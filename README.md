@@ -2,7 +2,7 @@
 
 **Two hands. No punches. Hold on.**
 
-GrabShift is a complete local two-player browser physics brawler. Grab a friend, a ledge, or a swinging crate. Build momentum, release at the right moment, and stay out of **The Pit**. First to three round wins takes the match.
+GrabShift is a browser physics brawler for **one or two players**. Challenge an easy, medium, or hard bot, or wrestle a friend on the same keyboard. Grab a rival, a ledge, or a swinging crate. Build momentum, release at the right moment, and stay out of **The Pit**. First to three round wins takes the match.
 
 ![GrabShift gameplay in The Pit](docs/screenshot.png)
 
@@ -10,7 +10,23 @@ GrabShift is a complete local two-player browser physics brawler. Grab a friend,
 
 ## Play
 
-Choose **Play Local**, read the controls, then **Let's Grab**. Both people play on one keyboard. No account, backend, external fonts, remote assets, or network connection is needed after the static game loads.
+Choose **Play Game** to open the match setup. Select **2 players · local** or **Player vs bot** from the game-mode dropdown. Choosing a bot reveals the **Easy / Medium / Hard** difficulty dropdown in the same panel. Press **Continue**, read the controls, then **Let's Grab**.
+
+In solo mode you control Player 1; the bot controls Player 2, and Player 2's keyboard inputs are ignored. In local mode both people play on one keyboard. Rematch and Restart Match preserve the selected mode and difficulty. Return to the main menu to change them. Selections are remembered while the page remains open.
+
+No account, backend, external fonts, remote assets, or network connection is needed after the static game loads. The bot runs entirely on your device.
+
+### Bot difficulties
+
+| Difficulty | Combat style |
+| --- | --- |
+| Easy | 300 ms combat decisions, occasional hesitation, single-hand wrestling, and longer openings after release. |
+| Medium | 150 ms combat decisions, both hands, moderate movement prediction, and balanced grip/release timing. |
+| Hard | 75 ms combat decisions, both hands, more movement prediction, stable dragging, and releases chosen near arena edges. |
+
+All difficulties share basic crate/gap traversal and use the same character physics, mass, force, jump cooldown, and grab radius as you. Difficulty changes decisions, never physical strength. Bots approach, jump obstacles, catch arena surfaces, swing, grab rivals, release, and attempt recovery. A failed recovery eventually releases its grips rather than hanging under a platform indefinitely.
+
+![Match setup with bot difficulty selection](docs/match-setup.png)
 
 | Action | Player 1 · circle | Player 2 · diamond |
 | --- | --- | --- |
@@ -35,7 +51,7 @@ npm install
 npm run dev
 ```
 
-Open the address printed by Vite. Two physical players and a desktop keyboard are the intended input setup. Use `npm ci` instead of `npm install` for a reproducible lockfile installation.
+Open the address printed by Vite. A desktop keyboard is the intended input setup; solo mode needs one person, local mode needs two. Use `npm ci` instead of `npm install` for a reproducible lockfile installation.
 
 ```sh
 npm run typecheck
@@ -79,6 +95,7 @@ src/
   game/
     Game.ts                  Phaser Canvas renderer and fixed logical resolution
     config.ts                World dimensions, physics tuning, input types
+    match.ts                 Shared match options, difficulty labels, player names
     scenes/GameScene.ts      Lifecycle, fixed-step loop, round/UI coordination
     entities/Ragdoll.ts      Ten rigid bodies, nine joints, balance and movement
     entities/Hand.ts         Independent grip state and hand position
@@ -87,6 +104,7 @@ src/
     systems/Simulation.ts   Headless Matter world; reset and disposal
     systems/GrabSystem.ts   Nearest surface detection, reach, grip constraints
     systems/InputSystem.ts Keyboard edges and held movement
+    systems/BotSystem.ts   Seedable AI that emits ordinary player inputs
     systems/RoundSystem.ts Countdown, scoring, draws, and match state machine
     systems/EffectsSystem.ts Bounded particles, flashes, shake, throw slowdown
     systems/SoundSystem.ts Original Web Audio cues
@@ -100,6 +118,8 @@ public/                     Original local SVG illustration and icon
 
 Phaser 3 handles rendering and the game lifecycle. Standalone Matter.js drives a fixed **60 Hz** simulation independent of rendering, making physics tests use the same code as gameplay. A bounded accumulator prevents runaway catch-up after stalls. Logical coordinates remain 1280 × 720 as the view scales with letterboxing.
 
+`GameScene` substitutes bot input for Player 2 only during active solo rounds. Countdown, pause, result, and victory screens never request bot decisions. `BotSystem` uses simulation time, ordinary `PlayerInput` values, and seeded randomness; it never mutates bodies or constraints. Navigation tracks a landing point after obstacle hops, while combat considers the opponent, nearby edges, grip ages, and momentum. Round resets clear the controller's cached movement, navigation, grip tracking, and cooldowns. The bot has no independent timers or event listeners.
+
 Movement uses body forces. Soft angular servos and a grounded suspension force help the characters stand; jumping changes velocity as an impulse. Airborne bodies remain physical. Grip constraints retain body momentum on release. Collision intensity uses relative velocity projected onto the contact normal. Minor contacts do not trigger effects. Particles are capped, sound nodes disconnect after each cue, and resets rebuild only the physics world without registering new listeners.
 
 ### Tuning
@@ -112,7 +132,7 @@ Start in `src/game/config.ts`. Movement force, air control, jump speed, coyote t
 - Menus support keyboard focus; pause and round announcements have semantic HTML.
 - Sound, volume, and reduced motion are saved locally. Private browsing/storage failures fall back to in-memory settings.
 - Focus loss automatically pauses a match to avoid stuck keys or unattended falls.
-- This MVP has one arena, local keyboard multiplayer, and no AI, online multiplayer, touch controls, or gamepad support.
+- Version 2 has one arena, local keyboard multiplayer, and solo play against three bot difficulties. Online multiplayer, touch controls, and gamepad support are not included.
 - Hardware keyboard ghosting can limit simultaneous keys. A keyboard with good rollover is recommended.
 - Automated browser validation targets Chromium. Other current desktop browsers should support the APIs used, but have not all been release-tested. Gameplay itself is visual and not fully screen-reader playable.
 

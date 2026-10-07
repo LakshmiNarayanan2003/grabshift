@@ -39,3 +39,10 @@ h1 { font-size: 6.65cqw; line-height: .96; letter-spacing: -.43cqw; margin: 0; f
 .round-message { position: absolute; top: 34%; left: 0; right: 0; text-align: center; text-shadow: 0 .3cqw 2cqw #000b; } .round-message strong { display: block; font-size: 8cqw; line-height: 1.2; color: #d9f978; letter-spacing: -.3cqw; } .round-message small { font-size: .8cqw; letter-spacing: .4cqw; font-weight: 700; color: #d7e1d3; } .round-message span { color: #a1b8b8; font-size: 1.15cqw; } .result-message { top: 32%; padding: 2cqw 0; background: #0a141cbf; } .result-message strong { font-size: 4.6cqw; margin: .7cqw 0; }
 .winner-panel { text-align: center; } .winner-symbol { color: var(--player); font-size: 3cqw; display: block; margin-bottom: 1.4cqw; } .winner-panel h2 { color: var(--player); font-size: 4.2cqw; } .final-score { font-size: 3cqw; color: #eaf1ed; font-weight: 700; margin: 1.8cqw 0; } .final-score span { color: #516a6d; padding: 0 1cqw; }
 @media (prefers-reduced-motion: reduce) { button { transition: none; } button:hover { transform: none; } }
+.select-label { display: block; color: #c5d798; font: 700 .75cqw 'Courier New', monospace; letter-spacing: .13cqw; margin: 1.5cqw 0 .7cqw; }
+.setup-panel select { width: 100%; font: 600 1.15cqw Arial, sans-serif; background: #0f1922; color: #eaf1ed; border: 1px solid #58716b; border-radius: .35cqw; padding: 1.05cqw .9cqw; cursor: pointer; color-scheme: dark; }
+.setup-panel select:focus-visible { outline: 3px solid #d9f978; outline-offset: 3px; }
+.mode-description { color: #a9bfc1; font-size: .95cqw; line-height: 1.6; margin: 1.15cqw 0 1.65cqw; min-height: 2.5cqw; }
+.bot-controls p { color: #b1c2c3; font-size: .95cqw; line-height: 1.6; margin: 1cqw 0; }
+.bot-controls .bot-fairness { color: #ffac78; font-size: .8cqw; }
+.text-button { border: 0; padding: .7cqw 0; color: #c5d798; background: transparent; font: 700 .8cqw 'Courier New', monospace; letter-spacing: .04cqw; }
