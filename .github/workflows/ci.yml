@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  pull_request:
+  workflow_call:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Typecheck, physics, browser, production
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:e2e
+      - run: npm run test:production
+      - name: Package source release
+        run: python3 scripts/package-release.py
+      - name: Upload downloadable source ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: grabshift-source
+          path: grabshift.zip
+          if-no-files-found: error
+          retention-days: 90
+      - name: Preserve browser failure traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: browser-test-results
+          path: test-results/
+          retention-days: 7
