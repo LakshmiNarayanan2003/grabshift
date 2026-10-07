@@ -77,13 +77,13 @@ Development-only **F3** shows physics outlines, constraints, grab radii, player 
 
 ## GitHub Pages
 
-The included `.github/workflows/pages.yml` handles installation, build, artifact upload, and Pages deployment for pushes to `master` or `main`. It calls the reusable CI workflow first; a failed typecheck, physics test, browser test, or production smoke test prevents deployment. Pull requests run the same CI separately.
+The included `.github/workflows/pages.yml` handles installation, build, artifact upload, and Pages deployment for pushes to `master` or `main`. It calls the reusable CI workflow on Node 22 and 24 first; a failed typecheck, physics test, browser test, or production smoke test prevents deployment. Pull requests run the same CI separately.
 
 In the repository's **Settings → Pages**, choose **GitHub Actions** as the publishing source. Then a push to `master`/`main`, or running the **GitHub Pages** workflow manually, publishes the game. This is a repository setting; no source file changes or credentials in the project are needed. The relative Vite base (`./`) supports both a project URL such as `/grabshift/` and a custom-domain root.
 
 The deliverable includes the workflows; creating this archive does not push, publish, or configure a GitHub repository.
 
-Each successful CI run also publishes a **grabshift-source** artifact containing `grabshift.zip`. Open the run in the repository's **Actions** tab and download that artifact. GitHub wraps artifacts in an outer ZIP; extract it to obtain `grabshift.zip`, whose project root is `grabshift/`. GitHub requires sign-in to download Actions artifacts. To create the same source archive locally, run `python3 scripts/package-release.py` (Python 3 required only for packaging).
+The Node 22 CI job also publishes a **grabshift-source** artifact containing `grabshift.zip`. Open the run in the repository's **Actions** tab and download that artifact. GitHub wraps artifacts in an outer ZIP; extract it to obtain `grabshift.zip`, whose project root is `grabshift/`. GitHub requires sign-in to download Actions artifacts. To create the same source archive locally, run `python3 scripts/package-release.py` (Python 3 required only for packaging).
 
 ## Architecture
 

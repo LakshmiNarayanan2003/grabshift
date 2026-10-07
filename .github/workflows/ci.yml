@@ -10,14 +10,18 @@ permissions:
 
 jobs:
   validate:
-    name: Typecheck, physics, browser, production
+    name: Node ${{ matrix.node }} · typecheck, physics, browser, production
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [22, 24]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: ${{ matrix.node }}
           cache: npm
       - run: npm ci
       - run: npm run typecheck
@@ -29,6 +33,7 @@ jobs:
       - name: Package source release
         run: python3 scripts/package-release.py
       - name: Upload downloadable source ZIP
+        if: matrix.node == 22
         uses: actions/upload-artifact@v4
         with:
           name: grabshift-source
@@ -39,6 +44,6 @@ jobs:
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: browser-test-results
+          name: browser-test-results-node-${{ matrix.node }}
           path: test-results/
           retention-days: 7

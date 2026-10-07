@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Fixed a Node 22 CI failure caused by requiring one chaotic bot fight to end in a win. Traversal now checks safe approach and engagement; separate controlled throw scenarios verify releases, momentum, and elimination for every difficulty.
+- Added Node 22 and 24 CI coverage, with unique failure artifacts and a single source ZIP upload.
+
 ## 2.0.0 — 2026-10-07
 
 - Added a Play Game setup dialog with local two-player and player-versus-bot modes, plus an inline difficulty selector.
