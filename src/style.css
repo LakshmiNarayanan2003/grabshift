@@ -5,7 +5,7 @@
 .main-menu { height: 100%; position: relative; background: #101720; overflow: hidden; padding: 3cqw 4.7cqw; }
 .brand-bar, .menu-footer { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
 .brand { color: #f0f5ed; font-size: 1.3cqw; font-weight: 900; letter-spacing: .1cqw; display: flex; align-items: center; gap: .8cqw; }
-.brand-mark { display: grid; place-items: center; width: 2.4cqw; height: 2.4cqw; color: #131a1d; border-radius: .55cqw; background: #d9f978; font-size: 2.1cqw; }
+.brand-mark { display: block; flex: none; width: 2.4cqw; height: 2.4cqw; object-fit: contain; }
 .edition, .eyebrow, .keyboard-note, .menu-footer, .arena-tag, .player-label, .round-label, .fineprint { font-family: 'Courier New', monospace; }
 .edition { font-size: .76cqw; letter-spacing: .12cqw; color: #94a4a8; display: flex; align-items: center; gap: 1.4cqw; }
 .edition i { height: .45cqw; width: .45cqw; border-radius: 50%; background: #d9f978; box-shadow: 0 0 1cqw #d9f94855; }

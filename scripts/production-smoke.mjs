@@ -50,7 +50,13 @@ try {
   const bounds = await page.locator('canvas').boundingBox();
   assert.ok(Math.abs(bounds.width / bounds.height - 16 / 9) < 0.01);
   await page.getByRole('button', { name: 'MAIN MENU', exact: true }).click();
-  assert.equal(await page.locator('.menu-art img').evaluate(img => img.complete && img.naturalWidth > 0), true);
+  // Menu images are recreated on return; wait for decoding before checking them.
+  for (const selector of ['.menu-art img', '.brand-mark']) {
+    assert.equal(await page.locator(selector).evaluate(async img => {
+      await img.decode();
+      return img.complete && img.naturalWidth > 0;
+    }), true, `${selector} loads beneath the repository subdirectory`);
+  }
   // Exercise solo mode in the actual release bundle, without the development hook.
   await page.getByRole('button', { name: 'PLAY GAME' }).click();
   await page.getByLabel('GAME MODE').selectOption('bot');

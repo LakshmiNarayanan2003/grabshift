@@ -2,11 +2,37 @@
 
 **Two hands. No punches. Hold on.**
 
+**Current version: 2.0.0** · Solo or local multiplayer · TypeScript / Vite / Phaser 3 / Matter.js
+
 GrabShift is a browser physics brawler for **one or two players**. Challenge an easy, medium, or hard bot, or wrestle a friend on the same keyboard. Grab a rival, a ledge, or a swinging crate. Build momentum, release at the right moment, and stay out of **The Pit**. First to three round wins takes the match.
 
 ![GrabShift gameplay in The Pit](docs/screenshot.png)
 
 <!-- Screenshot slot: replace docs/screenshot.png with a new 1280 × 720 gameplay capture when the arena changes. -->
+
+## Features by version
+
+### v1 — Local physics brawling
+
+- **Two players, one keyboard:** ten-body humanoid ragdolls with force-driven movement, grounded jumps, and distinct circle/diamond identities.
+- **Two independent hands:** grab opponents, platforms, ropes, crates, and the wrecking ball; climb, swing, and release to throw with preserved momentum.
+- **The Pit:** split platforms, a central drop, an overhead bar, a suspended crate, two loose crates, and a swinging wrecking ball.
+- **First-to-three matches:** countdowns, scoring, simultaneous-fall draws, automatic round resets, rematches, and pause on focus loss.
+- **Game feel and accessibility:** impact particles, flashes, camera shake, brief slow motion, original synthesized sound, keyboard-accessible menus, volume controls, and reduced motion.
+- **Open-source browser release:** responsive desktop layout, development physics overlay, automated tests, MIT licensing, and CI-gated GitHub Pages deployment.
+
+### v2 — Solo play and selectable rivals
+
+**v2 includes every v1 feature** and adds:
+
+- **Player vs bot:** play solo against an opponent that moves, jumps, grabs, swings, throws, and attempts to recover from falls.
+- **Three difficulties:** Easy, Medium, and Hard change reaction time, anticipation, hand use, and release timing. Every bot uses the same physics and movement limits as a human player.
+- **Match setup:** choose **2 players · local** or **Player vs bot** after selecting **Play Game**. The bot difficulty dropdown appears in the same panel.
+- **Mode-aware UI:** solo instructions, bot difficulty in the HUD, and correct human/bot winner messages. Player 2's keys remain available in local matches.
+- **Persistent match choices:** rematches and restarts retain mode and difficulty; return to the menu to choose another rival.
+- **Expanded validation:** bot navigation, throw, fairness, and stress tests; browser coverage for each difficulty; and production solo-mode checks. CI validates Node 22 and 24 before deployment.
+
+See the [changelog](CHANGELOG.md) for release history and the [release audit](docs/RELEASE_AUDIT.md) for validation details and known limits.
 
 ## Play
 
@@ -27,6 +53,8 @@ No account, backend, external fonts, remote assets, or network connection is nee
 All difficulties share basic crate/gap traversal and use the same character physics, mass, force, jump cooldown, and grab radius as you. Difficulty changes decisions, never physical strength. Bots approach, jump obstacles, catch arena surfaces, swing, grab rivals, release, and attempt recovery. A failed recovery eventually releases its grips rather than hanging under a platform indefinitely.
 
 ![Match setup with bot difficulty selection](docs/match-setup.png)
+
+### Controls and how to play
 
 | Action | Player 1 · circle | Player 2 · diamond |
 | --- | --- | --- |

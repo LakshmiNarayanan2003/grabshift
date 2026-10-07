@@ -54,7 +54,7 @@ export class UI {
   }
   showMenu(): void {
     this.render(`<main class="main-menu" aria-label="Main menu">
-      <header class="brand-bar"><span class="brand"><span class="brand-mark">↯</span> GRABSHIFT</span><span class="edition">LOCAL + SOLO <i></i> V2.0</span></header>
+      <header class="brand-bar"><span class="brand"><img class="brand-mark" src="${import.meta.env.BASE_URL}favicon.svg" width="64" height="64" alt="" aria-hidden="true" /> GRABSHIFT</span><span class="edition">LOCAL + SOLO <i></i> V2.0</span></header>
       <div class="menu-copy"><p class="eyebrow"><span></span> A PHYSICS BRAWLER WITH BITE</p><h1>HOLD ON.<br><em>LET LOOSE.</em></h1>
       <p class="intro">Two hands. No punches. No promises.<br>Grab your rival. Find your momentum.<br>Try not to fall.</p>
       <button class="primary play" data-action="play">PLAY GAME <span aria-hidden="true">→</span></button>

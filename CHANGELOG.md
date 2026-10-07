@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Made the production asset check wait for image decoding after returning to the menu, including the logo.
+- Replaced the font-dependent menu logo with a centered SVG lightning mark shared with the favicon.
+- Documented the v1 feature set and v2 additions separately in the README.
+
 - Fixed a Node 22 CI failure caused by requiring one chaotic bot fight to end in a win. Traversal now checks safe approach and engagement; separate controlled throw scenarios verify releases, momentum, and elimination for every difficulty.
 - Added Node 22 and 24 CI coverage, with unique failure artifacts and a single source ZIP upload.
 
